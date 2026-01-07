@@ -1,0 +1,11 @@
+{
+  "name": "Turn 3D",
+  "id": "1234567890",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "index.html",
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  }
+}
