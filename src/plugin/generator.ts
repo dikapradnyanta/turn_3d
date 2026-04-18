@@ -37,19 +37,32 @@ function tintNode(node: SceneNode, hexColor: string, isTopLayer: boolean = false
   }
 }
 
-// Helper to recursively update text content if node contains text
 export async function updateTextContent(node: SceneNode, config: Text3DConfig) {
   if (node.type === 'TEXT') {
     const textNode = node as TextNode;
-    // For every text node we find, load its current font AND the new config font to be safe
-    if (textNode.fontName !== figma.mixed) {
-      await figma.loadFontAsync(textNode.fontName as FontName);
+    try {
+      // Cannot properly update text strings if the node is missing its local fonts.
+      if (textNode.hasMissingFont) {
+        console.warn('Skipping text update due to missing local fonts on this user machine.');
+        return;
+      }
+      
+      // Figma requires loading ALL local fonts in a node before setting .characters
+      const localFonts = textNode.getRangeAllFontNames(0, textNode.characters.length);
+      for (const font of localFonts) {
+        await figma.loadFontAsync(font);
+      }
+      
+      // Load the new target font
+      await figma.loadFontAsync({ family: config.text.fontFamily, style: config.text.fontWeight });
+      
+      // Set properties safely
+      textNode.fontName = { family: config.text.fontFamily, style: config.text.fontWeight };
+      textNode.characters = config.text.content;
+      textNode.fontSize = config.text.fontSize;
+    } catch (e) {
+      console.warn("Error updating text node: ", e);
     }
-    await figma.loadFontAsync({ family: config.text.fontFamily, style: config.text.fontWeight });
-    
-    textNode.characters = config.text.content;
-    textNode.fontName = { family: config.text.fontFamily, style: config.text.fontWeight };
-    textNode.fontSize = config.text.fontSize;
   } else if ('children' in node) {
     for (const child of node.children) {
       await updateTextContent(child as SceneNode, config);
