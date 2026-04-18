@@ -1,7 +1,7 @@
-// PresetManager.tsx - Preset management component
+// PresetManager.tsx - Preset management component (FIXED IMPORTS)
 
 import React, { useState } from 'react';
-import { Preset } from '../types';
+import { Preset } from '../../plugin/types';
 
 interface PresetManagerProps {
   presets: Preset[];

@@ -1,7 +1,5 @@
-// usePluginState.ts - Custom hook for plugin state management
-
 import { useState, useEffect, useCallback } from 'react';
-import { Text3DConfig, Preset, UIMessage, PluginMessage, DEFAULT_CONFIG } from '../types';
+import { Text3DConfig, Preset, UIMessage, PluginMessage, DEFAULT_CONFIG } from '../../plugin/types';
 
 interface PluginState {
   config: Text3DConfig;
@@ -12,7 +10,7 @@ interface PluginState {
   error: string | null;
 }
 
-interface PluginActions {
+export interface PluginActions {
   setConfig: (config: Text3DConfig) => void;
   setMode: (mode: 'simple' | 'advanced') => void;
   updateConfig: (updates: Partial<Text3DConfig>) => void;
@@ -36,12 +34,10 @@ export function usePluginState(): [PluginState, PluginActions] {
     error: null,
   });
 
-  // Post message to plugin
   const postMessage = useCallback((msg: PluginMessage) => {
     parent.postMessage({ pluginMessage: msg }, '*');
   }, []);
 
-  // Listen for messages from plugin
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const msg: UIMessage = event.data.pluginMessage;
@@ -87,8 +83,6 @@ export function usePluginState(): [PluginState, PluginActions] {
     };
 
     window.addEventListener('message', handleMessage);
-    
-    // Request presets on mount
     postMessage({ type: 'get-presets' });
     
     return () => {
@@ -96,7 +90,18 @@ export function usePluginState(): [PluginState, PluginActions] {
     };
   }, [postMessage]);
 
-  // Actions
+  // Debounced auto-preview
+  useEffect(() => {
+    // Prevent preview if no content and no baseNode
+    if (!state.config.baseNodeId && !state.config.text.content.trim()) return;
+
+    const handler = setTimeout(() => {
+      postMessage({ type: 'preview', config: state.config });
+    }, 200);
+
+    return () => clearTimeout(handler);
+  }, [state.config, postMessage]);
+
   const actions: PluginActions = {
     setConfig: useCallback((config: Text3DConfig) => {
       setState(prev => ({ ...prev, config }));
@@ -179,21 +184,4 @@ export function usePluginState(): [PluginState, PluginActions] {
   };
 
   return [state, actions];
-}
-
-// Helper hooks for specific sections
-export function useSimpleMode(actions: PluginActions) {
-  return {
-    updateHue: (hue: number) => actions.updateSimple({ baseHue: hue }),
-    updateDepth: (depth: number) => actions.updateSimple({ depth }),
-  };
-}
-
-export function useAdvancedMode(actions: PluginActions) {
-  return {
-    updateBody: (updates: any) => actions.updateAdvanced('body', updates),
-    updateHighlight: (updates: any) => actions.updateAdvanced('highlightTop', updates),
-    updateShadow: (updates: any) => actions.updateAdvanced('shadowBottom', updates),
-    updateGlow: (updates: any) => actions.updateAdvanced('glow', updates),
-  };
 }

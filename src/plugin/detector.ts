@@ -1,3 +1,5 @@
+/// <reference types="@figma/plugin-typings" />
+
 // detector.ts - Detect if selected group is plugin-generated or looks like 3D text
 
 import { Text3DConfig } from './types';
@@ -71,9 +73,10 @@ export function looksLike3DText(node: SceneNode): boolean {
 }
 
 export interface DetectionResult {
-  type: 'plugin-generated' | 'looks-like-3d' | 'not-3d' | 'no-selection';
+  type: 'plugin-generated' | 'looks-like-3d' | 'not-3d' | 'no-selection' | 'base-node';
   config?: Text3DConfig;
   node?: GroupNode;
+  baseNode?: SceneNode;
 }
 
 export function detectSelection(): DetectionResult {
@@ -107,5 +110,9 @@ export function detectSelection(): DetectionResult {
     };
   }
   
-  return { type: 'not-3d' };
+  // If it's a valid single node, offer to use it as base!
+  return { 
+    type: 'base-node',
+    baseNode: node
+  };
 }

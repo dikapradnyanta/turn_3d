@@ -1,0 +1,44 @@
+Diagnostic Report - Wed 01/07/2026 14:22:42.01 
+========================================== 
+ 
+ 
+SYSTEM INFO: 
+------------ 
+OS Name:                       Microsoft Windows 11 Home Single Language
+OS Version:                    10.0.26100 N/A Build 26100
+ 
+NODE.JS: v22.14.0 
+C:\Program Files\nodejs\node.exe
+ 
+NPM: 10.9.2 
+C:\Program Files\nodejs\npm
+C:\Program Files\nodejs\npm.cmd
+ 
+ 
+PROJECT STRUCTURE: 
+------------------ 
+FOUND: src\plugin\controller.ts 
+FOUND: src\plugin\types.ts 
+FOUND: src\plugin\generator.ts 
+MISSING: ui\ui.tsx 
+MISSING: ui\app.tsx 
+MISSING: ui\components\SimpleMode.tsx 
+MISSING: ui\components\AdvancedMode.tsx 
+MISSING: ui\components\PresetManager.tsx 
+FOUND: manifest.json 
+FOUND: package.json 
+FOUND: webpack.config.js 
+FOUND: tsconfig.json 
+ 
+NODE_MODULES: EXISTS 
+  - react: FOUND 
+  - typescript: FOUND 
+  - webpack: FOUND 
+ 
+  - code.js: MISSING 
+  - ui.js:  bytes 
+  - ui.js: MISSING 
+  - index.html:  bytes 
+  - index.html: MISSING 
+DIST: NOT FOUND 
+ 

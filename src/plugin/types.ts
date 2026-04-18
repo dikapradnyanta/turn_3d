@@ -1,5 +1,8 @@
 // types.ts - Core data models
 
+export type Direction3D = 'down-right' | 'down' | 'down-left' | 'right' | 'left';
+export type StylePreset = 'classic' | 'neon' | 'metallic' | 'comic' | 'retro' | 'candy';
+
 export interface Text3DConfig {
   version: string;
   text: {
@@ -12,11 +15,18 @@ export interface Text3DConfig {
   };
   
   mode: 'simple' | 'advanced';
+  baseNodeId?: string;
+  isGraphic?: boolean;
   
   // Simple mode
   simple: {
     baseHue: number; // 0-360
     depth: number; // jumlah layers
+    direction: Direction3D;
+    stylePreset: StylePreset;
+    offsetX: number; // per-layer offset X
+    offsetY: number; // per-layer offset Y
+    depthBlur?: number; // for anti-aliasing
   };
   
   // Advanced mode
@@ -39,6 +49,7 @@ export interface Text3DConfig {
         stops: Array<{ position: number; color: string }>;
       };
       unionMode: boolean;
+      depthBlur?: number;
     };
     
     shadowBottom: {
@@ -77,6 +88,11 @@ export const DEFAULT_CONFIG: Text3DConfig = {
   simple: {
     baseHue: 220,
     depth: 20,
+    direction: 'down-right',
+    stylePreset: 'classic',
+    offsetX: 1,
+    offsetY: 2,
+    depthBlur: 0.5,
   },
   advanced: {
     highlightTop: {
@@ -101,7 +117,8 @@ export const DEFAULT_CONFIG: Text3DConfig = {
           { position: 1, color: '#1E40AF' }
         ]
       },
-      unionMode: false
+      unionMode: false,
+      depthBlur: 1
     },
     shadowBottom: {
       layers: 6,
@@ -119,7 +136,7 @@ export const DEFAULT_CONFIG: Text3DConfig = {
 };
 
 export interface PluginMessage {
-  type: 'generate' | 'update' | 'load-config' | 'save-preset' | 'load-preset' | 'delete-preset' | 'get-presets';
+  type: 'generate' | 'update' | 'preview' | 'load-config' | 'save-preset' | 'load-preset' | 'delete-preset' | 'get-presets';
   config?: Text3DConfig;
   preset?: Preset;
   presetId?: string;
